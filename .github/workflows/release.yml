@@ -20,10 +20,14 @@ jobs:
         with: { python-version: '3.11' }
       - run: pip install -e . pyinstaller
       - run: pyinstaller --onefile --name athelper-probe athelper_probe/__main__.py
+      - name: Rename binary with platform suffix
+        run: |
+          cd dist
+          mv athelper-probe* "${{ matrix.artifact-name }}" || true
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact-name }}
-          path: dist/athelper-probe*
+          path: dist/${{ matrix.artifact-name }}
 
   release:
     needs: build
