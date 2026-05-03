@@ -1,0 +1,18 @@
+[project]
+name = "athelper-probe"
+version = "0.1.0"
+description = "ATHelper red-team CLI — run, report, list-probes, validate-target"
+requires-python = ">=3.11"
+dependencies = [
+    "click>=8.1",
+    "httpx>=0.27",
+    "pyyaml>=6.0,<7",
+    "pydantic>=2.5",
+]
+
+[project.scripts]
+athelper-probe = "athelper_probe.__main__:main"
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
