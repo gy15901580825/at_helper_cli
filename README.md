@@ -54,7 +54,7 @@ athelper-probe run \
   --format html --out report.html
 ```
 
-Get an API token by emailing `ops@at-helper.com`.
+Get an API token by emailing `contact@veyon.solutions`.
 
 ## Supported agent shapes
 
@@ -116,7 +116,7 @@ Each command's `--help` lists its flags.
 
 ## License
 
-MIT — see [LICENSE](./LICENSE).
+Apache-2.0 — see [LICENSE](./LICENSE). Copyright © 2026 Veyon Solutions.
 
 ## Security
 

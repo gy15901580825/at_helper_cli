@@ -2,7 +2,7 @@
 
 ## Reporting a vulnerability
 
-If you believe you've found a security issue in `athelper-probe`, please report it privately to **security@at-helper.com**.
+If you believe you've found a security issue in `athelper-probe`, please report it privately to **contact@veyon.solutions**.
 
 Please include:
 
@@ -22,7 +22,7 @@ In scope:
 - The `athelper-probe` CLI itself (this repository)
 - The PyInstaller-built binaries published under [Releases](https://github.com/gy15901580825/at_helper_cli/releases)
 
-Out of scope (report to `security@at-helper.com` separately if relevant):
+Out of scope (report to `contact@veyon.solutions` separately if relevant):
 
 - The ATHelper service / API
 - Probe content or judge behavior
