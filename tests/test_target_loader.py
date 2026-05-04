@@ -65,3 +65,24 @@ def test_missing_required_fields_per_kind(kind, partial):
     blob = json.dumps({"kind": kind, **partial})
     with pytest.raises(TargetLoadError, match="missing required"):
         load_target_spec(blob)
+
+
+def test_load_expands_env_vars_in_string_values(tmp_path, monkeypatch):
+    """${VAR} references in spec string values are expanded at load time."""
+    monkeypatch.setenv("MY_TEST_KEY", "secret-value-123")
+    target_path = tmp_path / "target.json"
+    target_path.write_text('{"kind": "openai_compat", "endpoint_url": "https://x", "model": "y", "api_key": "${MY_TEST_KEY}"}')
+    spec = load_target_spec(str(target_path))
+    assert spec["api_key"] == "secret-value-123"
+
+
+def test_load_unset_env_var_leaves_literal(tmp_path, monkeypatch):
+    """Unset env var: os.path.expandvars leaves the literal $VAR; we don't error.
+    Operator gets a 401 from the server with the literal string visible in the
+    error trail, which is debuggable."""
+    monkeypatch.delenv("DEFINITELY_UNSET_VAR_XYZ", raising=False)
+    target_path = tmp_path / "target.json"
+    target_path.write_text('{"kind": "openai_compat", "endpoint_url": "https://x", "model": "y", "api_key": "${DEFINITELY_UNSET_VAR_XYZ}"}')
+    spec = load_target_spec(str(target_path))
+    # os.path.expandvars on unset var returns the literal $VAR or ${VAR}
+    assert spec["api_key"].startswith("$")  # literal preserved
