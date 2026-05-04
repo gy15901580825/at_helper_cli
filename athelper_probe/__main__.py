@@ -2,6 +2,7 @@
 
 import click
 
+from athelper_probe.cmd_init import init_command
 from athelper_probe.cmd_run import cmd_run
 from athelper_probe.cmd_report import cmd_report
 from athelper_probe.cmd_list_probes import cmd_list_probes
@@ -14,6 +15,7 @@ def main():
     """ATHelper red-team CLI."""
 
 
+main.add_command(init_command, "init")
 main.add_command(cmd_run, "run")
 main.add_command(cmd_report, "report")
 main.add_command(cmd_list_probes, "list-probes")
