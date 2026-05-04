@@ -8,6 +8,7 @@ round-tripping to the server.
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 from typing import Any
 
@@ -26,6 +27,17 @@ _REQUIRED_FIELDS = {
 
 class TargetLoadError(ValueError):
     pass
+
+
+def _expand_env(value):
+    """Expand ${VAR} references in strings; recurse through dicts and lists."""
+    if isinstance(value, str):
+        return os.path.expandvars(value)
+    if isinstance(value, dict):
+        return {k: _expand_env(v) for k, v in value.items()}
+    if isinstance(value, list):
+        return [_expand_env(v) for v in value]
+    return value
 
 
 def load_target_spec(target_arg: str) -> dict[str, Any]:
@@ -58,4 +70,5 @@ def load_target_spec(target_arg: str) -> dict[str, Any]:
         raise TargetLoadError(
             f"target.kind={spec['kind']!r} missing required fields: {sorted(missing)}"
         )
+    spec = _expand_env(spec)
     return spec
