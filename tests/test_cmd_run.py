@@ -13,15 +13,13 @@ from athelper_probe.__main__ import main
 def test_run_calls_api_and_writes_report(tmp_path):
     runner = CliRunner()
     target_spec = {
+        "kind": "openai_compat",
         "endpoint_url": "https://api.example.com/v1/chat/completions",
         "model": "gpt-4",
         "api_key": "sk-test",
     }
-    target_file = tmp_path / "target.yaml"
-    target_file.write_text(f"""endpoint_url: {target_spec['endpoint_url']}
-model: {target_spec['model']}
-api_key: {target_spec['api_key']}
-""")
+    target_file = tmp_path / "target.json"
+    target_file.write_text(json.dumps(target_spec))
 
     fake_api = {
         "post_run": {"run_id": "abc-123"},
