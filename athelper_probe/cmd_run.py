@@ -6,6 +6,7 @@ import sys
 from pathlib import Path
 
 import click
+import httpx
 
 from athelper_probe import api_client
 from athelper_probe.target_loader import load_target_spec, TargetLoadError
@@ -19,7 +20,8 @@ from athelper_probe.target_loader import load_target_spec, TargetLoadError
 @click.option("--token", envvar="ATHELPER_API_TOKEN", required=True, help="Your ATHelper API token (or env ATHELPER_API_TOKEN).")
 @click.option("--api-url", default="https://www.at-helper.com", help="ATHelper API base URL.")
 @click.option("--max-wait", type=float, default=1800.0, help="Max seconds to wait for run completion.")
-def cmd_run(target: str, probe_ids: str, report_format: str, out_file: str, token: str, api_url: str, max_wait: float):
+@click.option("--per-run-cap", "per_run_cap", type=float, default=None, help="Maximum USD cost for this run (server enforces). Default: server-side default ($0.50).")
+def cmd_run(target: str, probe_ids: str, report_format: str, out_file: str, token: str, api_url: str, max_wait: float, per_run_cap: float | None):
     """Submit a red-team run and write the report to disk."""
     try:
         spec = load_target_spec(target)
@@ -34,9 +36,21 @@ def cmd_run(target: str, probe_ids: str, report_format: str, out_file: str, toke
     if probe_ids.strip() == "all":
         # Empty probe_ids means "all" per orchestrator convention.
         body["probe_ids"] = []
+    if per_run_cap is not None:
+        body["per_run_cap_usd"] = per_run_cap
 
     click.echo(f"Submitting run to {api_url}/api/v1/redteam/runs ...")
-    resp = api_client.post_run(api_url, token, body=body)
+    try:
+        resp = api_client.post_run(api_url, token, body=body)
+    except httpx.HTTPStatusError as e:
+        if e.response.status_code == 402:
+            try:
+                detail = e.response.json().get("detail", "cost cap exceeded")
+            except Exception:
+                detail = "cost cap exceeded"
+            click.echo(f"ATHelper rejected run for cost: {detail}", file=sys.stderr)
+            sys.exit(402)
+        raise
     run_id = resp["run_id"]
     click.echo(f"  run_id: {run_id}")
 
