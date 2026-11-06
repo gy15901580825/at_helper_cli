@@ -56,6 +56,18 @@ athelper-probe run \
 
 Get an API token by emailing `contact@veyon.solutions`.
 
+### Several organizations
+
+If your account belongs to more than one organization, pick the one to act in. The CLI then sends it as the `x-org-id` header on every ATHelper API request.
+
+```bash
+athelper-probe --org-id 3f2b8c1e-0000-4000-8000-000000000000 run ...
+# or
+export ATHELPER_ORG_ID=3f2b8c1e-0000-4000-8000-000000000000
+```
+
+The flag goes before the subcommand and beats the environment variable. It must be a UUID. With neither set, the header is not sent and you act in your personal organization.
+
 ## Supported agent shapes
 
 `athelper-probe init --kind <X>` generates a target spec for one of:
